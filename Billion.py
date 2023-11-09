@@ -1,16 +1,39 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
 from folium.plugins import HeatMap
 from wordcloud import WordCloud
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 # Load your dataset
 df = pd.read_csv('Billionaires Dataset.csv')
 
 # Check if 'category' and 'gender' columns exist in the dataset
 if 'category' in df.columns and 'gender' in df.columns:
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(to bottom, #0077b6, #00a5cf, #00c5af);
+            color: white;
+        }
+        .st-cj {
+            padding: 10px;
+        }
+        .st-eb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # Title for the dashboard
     st.title('Mugare List of Billionaires Dashboard')
 
@@ -35,7 +58,7 @@ if 'category' in df.columns and 'gender' in df.columns:
 
     # Display a table of the filtered data
     st.subheader('Table of Billionaires')
-    st.write(filtered_data)
+    st.dataframe(filtered_data, height=400)
 
     # Additional charts
     # 1. Histogram of Wealth Distribution
@@ -54,22 +77,6 @@ if 'category' in df.columns and 'gender' in df.columns:
     # 3. Pair Plot for Multivariate Analysis
     st.subheader('Pair Plot for Multivariate Analysis')
     st.pyplot(sns.pairplot(filtered_data, hue='category', markers=["o", "s", "D"]))
-
-
-
-    # 5. Correlation Heatmap (if you have numeric columns)
-    st.subheader('Correlation Heatmap')
-    fig, ax = plt.subplots(figsize=(10, 8))
-    correlation_matrix = filtered_data.corr()
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', ax=ax)
-    st.pyplot(fig)
-
-    # 6. Geospatial Heatmap for Location Density
-    st.subheader('Geospatial Heatmap of Billionaire Locations')
-    locations = filtered_data[['latitude_country', 'longitude_country']].values
-    m = folium.Map(location=[filtered_data['latitude_country'].mean(), filtered_data['longitude_country'].mean()], zoom_start=5)
-    HeatMap(locations).add_to(m)
-    st.map(m)
 
     # 7. Word Cloud for Popular Names or Keywords (if you have a 'personName' or 'keywords' column)
     st.subheader('Word Cloud for Popular Names or Keywords')
