@@ -1,13 +1,9 @@
 import streamlit as st
 import pandas as pd
 import seaborn as sns
-import folium
-from folium.plugins import HeatMap
-from wordcloud import WordCloud
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
 
 # Load your dataset
 df = pd.read_csv('Billionaires Dataset.csv')
@@ -78,15 +74,16 @@ if 'category' in df.columns and 'gender' in df.columns:
     st.subheader('Pair Plot for Multivariate Analysis')
     st.pyplot(sns.pairplot(filtered_data, hue='category', markers=["o", "s", "D"]))
 
-    # 7. Word Cloud for Popular Names or Keywords (if you have a 'personName' or 'keywords' column)
-    st.subheader('Word Cloud for Popular Names or Keywords')
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(' '.join(filtered_data['personName']))
-    st.image(wordcloud.to_array(), use_container_width=True)
-
     # Add a pie chart to show the distribution of categories for the selected gender
     st.subheader('Distribution of Categories for the Selected Gender')
     category_counts = filtered_data['category'].value_counts()
     st.pyplot(plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140))
+
+    # Create a sample Seaborn plot
+    st.subheader('Sample Seaborn Plot')
+    data = sns.load_dataset("iris")
+    sns.boxplot(x="species", y="sepal_length", data=data)
+    st.pyplot()
 
 # End the Streamlit app
 st.stop()
