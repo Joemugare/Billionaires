@@ -1,0 +1,52 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import folium
+
+# Load your dataset
+df = pd.read_csv('Billionaires Dataset.csv')
+
+# Title for the dashboard
+st.title('Billionaires Dashboard')
+
+# Sidebar for user input
+st.sidebar.header('Filter Data')
+selected_category = st.sidebar.selectbox('Select Category', df['category'].unique())
+selected_gender = st.sidebar.selectbox('Select Gender', df['gender'].unique())
+
+# Filter the data based on user selection
+filtered_data = df[(df['category'] == selected_category) & (df['gender'] == selected_gender)]
+
+# Display a bar chart of the filtered data
+st.subheader('Distribution of Billionaires by Age in the Selected Category and Gender')
+age_counts = filtered_data['age'].value_counts()
+st.bar_chart(age_counts)
+
+# Display a scatter plot of 'finalWorth' vs. 'age' for the filtered data
+st.subheader('Final Worth vs. Age for the Selected Category and Gender')
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=filtered_data, x='age', y='finalWorth')
+st.pyplot(plt)
+
+# Display a table of the filtered data
+st.subheader('Table of Billionaires')
+st.write(filtered_data)
+
+# Add a map showing the locations of billionaires (assuming you have 'latitude_country' and 'longitude_country)
+if 'latitude_country' in filtered_data.columns and 'longitude_country' in filtered_data.columns:
+    st.subheader('Map of Billionaires')
+    m = folium.Map(location=[filtered_data['latitude_country'].mean(), filtered_data['longitude_country'].mean()], zoom_start=5)
+    for index, row in filtered_data.iterrows():
+        folium.Marker([row['latitude_country'], row['longitude_country']], tooltip=row['personName']).add_to(m)
+    st.map(m)
+
+# Add a pie chart to show the distribution of categories for the selected gender
+st.subheader('Distribution of Categories for the Selected Gender')
+category_counts = filtered_data['category'].value_counts()
+st.pyplot(plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140))
+
+# You can continue adding more visualizations and components as needed
+
+# End the Streamlit app
+st.stop()
